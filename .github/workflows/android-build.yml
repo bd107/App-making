@@ -19,15 +19,19 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: "latest"
-          accept-android-sdk-licenses: true
-          packages: |
-            platform-tools
-            platforms;android-33
-            build-tools;33.0.2
+      - name: Install Android Command Line Tools
+        run: |
+          mkdir -p $HOME/android/cmdline-tools
+          cd $HOME/android/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip -qq cmdline-tools.zip
+          rm cmdline-tools.zip
+          mkdir -p $HOME/android/sdk
+          yes | $HOME/android/cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android/sdk "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+        shell: bash
+
+      - name: Set ANDROID_HOME
+        run: echo "ANDROID_SDK_ROOT=$HOME/android/sdk" >> $GITHUB_ENV
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
